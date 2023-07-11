@@ -4,18 +4,14 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Twitch stats',
   description: 'Twitch stats, by Yuval and Ofir',
+  title: 'Twitch stats',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  )
-}
+const RootLayout = ({ children }: { children: React.ReactNode }) => (
+  <html lang="en">
+    <body className={inter.className}>{children}</body>
+  </html>
+)
+
+export default RootLayout
