@@ -1,7 +1,15 @@
 {
   "name": "twitch-stats",
   "version": "0.1.0",
-  "author": "Yuval Maron",
+  "contributors": [
+    {
+      "name": "Yuval Maron",
+      "url": "https://yuvals-stuff.com"
+    },
+    {
+      "name": "Ofir Benyacov"
+    }
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
