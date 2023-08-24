@@ -31,7 +31,7 @@ export type Channel = InferModel<typeof ChannelTable>
 export type Daily = InferModel<typeof DailyTable>
 export type Role = InferModel<typeof RoleTable>
 
-export type Message<IncludeChannel extends boolean> =
+export type Message<IncludeChannel extends boolean = false> =
   IncludeChannel extends true
     ? ReplaceBadges<InferModel<typeof MessageTable>> & { channel: Channel }
     : ReplaceBadges<InferModel<typeof MessageTable>>

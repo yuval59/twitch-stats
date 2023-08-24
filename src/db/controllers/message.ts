@@ -1,11 +1,18 @@
-import { and, asc, between, desc, eq } from 'drizzle-orm'
+import { asc, between, desc, eq } from 'drizzle-orm'
 import { ChannelController } from './channel'
 import { MAXIMUM_MESSAGES, MINIMUM_MESSAGES } from './constants'
 import { Controller } from './controller'
 import { MessageTable } from './schemas'
 import { Message } from './types'
 
-type SortParams = { field: keyof Message<false>; order: 'ASC' | 'DESC' }
+type SortParams = { field: keyof Message; order: 'ASC' | 'DESC' }
+
+type GetMessagesByUsernameParams = {
+  username: string
+  limit: number
+  channelName?: string
+  sort?: SortParams
+}
 
 export class MessageController extends Controller {
   static getMessagesBetween = async (
@@ -23,17 +30,16 @@ export class MessageController extends Controller {
   }
 
   static getMessagesByUsername = async (
-    username: string,
-    channelName: string,
-    limit: number,
-    sort?: SortParams
-  ): Promise<Message<false>[]> => {
-    if (limit > MAXIMUM_MESSAGES) limit = MAXIMUM_MESSAGES
-    if (limit < MINIMUM_MESSAGES) limit = MINIMUM_MESSAGES
+    params: GetMessagesByUsernameParams
+  ): Promise<Message[]> => {
+    const { limit, username, channelName, sort } = params
 
-    const channel = await ChannelController.getChannelByName(channelName)
-
-    if (!channel) return []
+    const boundLimit =
+      limit < MAXIMUM_MESSAGES
+        ? limit > MINIMUM_MESSAGES
+          ? limit
+          : MINIMUM_MESSAGES
+        : MAXIMUM_MESSAGES
 
     const orderBy = sort
       ? sort.order == 'ASC'
@@ -42,14 +48,15 @@ export class MessageController extends Controller {
       : undefined
 
     const res = await this.dbInstance.query.MessageTable.findMany({
-      where: and(
-        eq(MessageTable.channelId, channel.id),
-        eq(MessageTable.username, username)
-      ),
-      limit,
+      where: (messages, { and, eq }) =>
+        and(
+          eq(messages.channel.name, channelName),
+          eq(messages.username, username)
+        ),
+      limit: boundLimit,
       orderBy,
     })
 
-    return res as Message<false>[]
+    return res as Message[]
   }
 }
